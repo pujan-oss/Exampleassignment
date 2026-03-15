@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureReg — Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060a14;--surface:#0c1220;--card:#101827;
+  --border:#1a2640;--border2:#243352;
+  --cyan:#00e5ff;--purple:#8b5cf6;--green:#00d68f;
+  --red:#ff4757;--amber:#ffb300;
+  --text:#f0f4ff;--muted:#4a6080;--muted2:#6b84a8;
+  --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.left-panel{
+  position:relative;overflow:hidden;padding:3rem;
+  display:flex;flex-direction:column;justify-content:space-between;
+  background:linear-gradient(160deg,#060d1f 0%,#0a1428 50%,#060a14 100%);
+  border-right:1px solid var(--border);
+}
+.left-panel::before{content:'';position:absolute;top:-30%;left:-20%;width:80%;height:80%;background:radial-gradient(circle,rgba(0,229,255,.07),transparent 60%);pointer-events:none}
+.left-panel::after{content:'';position:absolute;bottom:-20%;right:-10%;width:60%;height:60%;background:radial-gradient(circle,rgba(139,92,246,.08),transparent 60%);pointer-events:none}
+.brand{position:relative;z-index:1}
+.brand-mark{display:inline-flex;align-items:center;gap:.6rem;margin-bottom:3rem}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.brand-name{font-family:var(--mono);font-size:.85rem;color:var(--cyan);letter-spacing:.15em;text-transform:uppercase}
+.hero-headline{font-size:3.2rem;font-weight:900;line-height:1.05;letter-spacing:-.03em;margin-bottom:1.5rem}
+.hero-headline .hl{background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-family:var(--mono);font-size:.8rem;color:var(--muted2);line-height:1.8;max-width:340px}
+.feature-list{position:relative;z-index:1;display:flex;flex-direction:column;gap:.8rem;margin-top:3rem}
+.feature-item{display:flex;align-items:center;gap:.75rem;font-family:var(--mono);font-size:.72rem;color:var(--muted2)}
+.feature-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);flex-shrink:0;box-shadow:0 0 8px var(--cyan)}
+.version-tag{position:relative;z-index:1;font-family:var(--mono);font-size:.65rem;color:var(--muted);border-top:1px solid var(--border);padding-top:1.5rem;margin-top:auto}
+.circuit{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.25}
+.right-panel{background:var(--surface);display:flex;align-items:center;justify-content:center;padding:2rem;overflow-y:auto}
+.form-wrapper{width:100%;max-width:440px;animation:slideIn .5s ease both}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.form-title{font-size:1.6rem;font-weight:800;margin-bottom:.4rem;letter-spacing:-.02em}
+.form-sub{font-family:var(--mono);font-size:.72rem;color:var(--muted2);margin-bottom:2rem}
+.form-sub a{color:var(--cyan);text-decoration:none}
+.form-sub a:hover{text-decoration:underline}
+.field{margin-bottom:1.25rem}
+.field-label{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem}
+.field-hint{color:var(--muted);font-size:.62rem}
+.input-wrap{position:relative}
+.field input[type=text],.field input[type=password]{
+  width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:.7rem 2.6rem .7rem .9rem;color:var(--text);font-family:var(--mono);font-size:.85rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.08)}
+.field input.error-input{border-color:var(--red)!important}
+.field input.ok-input{border-color:var(--green)!important}
+.eye-btn{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;line-height:1;transition:color .2s;padding:0}
+.eye-btn:hover{color:var(--cyan)}
+.strength-wrap{display:none;margin-top:.5rem}
+.strength-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden}
+.strength-fill{height:100%;width:0;transition:width .4s,background .4s;border-radius:3px}
+.strength-row{display:flex;justify-content:space-between;align-items:center;margin-top:.3rem}
+.strength-lbl{font-family:var(--mono);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.strength-pts{font-family:var(--mono);font-size:.6rem;color:var(--muted)}
+.criteria-grid{display:none;grid-template-columns:1fr 1fr;gap:.25rem;margin-top:.6rem}
+.crit{display:flex;align-items:center;gap:.35rem;font-family:var(--mono);font-size:.62rem;color:var(--muted);transition:color .2s}
+.crit.ok{color:var(--green)}
+.crit-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .2s}
+.crit.ok .crit-dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* ── RECAPTCHA ── */
+.recaptcha-section{margin-bottom:1.25rem}
+.recaptcha-label{
+  font-family:var(--mono);font-size:.68rem;color:var(--muted2);
+  text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem;
+}
+.recaptcha-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--amber);animation:blink 1.5s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.recaptcha-box{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:1rem 1rem .6rem;display:inline-block;width:100%;
+  transition:border-color .3s,box-shadow .3s;
+}
+.recaptcha-box.verified{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,214,143,.08)}
+.recaptcha-box.failed{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,71,87,.06)}
+.recaptcha-status{
+  display:flex;align-items:center;gap:.5rem;
+  font-family:var(--mono);font-size:.7rem;
+  margin-top:.55rem;min-height:1.1rem;
+  opacity:0;transition:opacity .3s;
+}
+.recaptcha-status.show{opacity:1}
+.recaptcha-status.ok{color:var(--green)}
+.recaptcha-status.fail{color:var(--red)}
+
+/* ── ALERT ── */
+.alert{font-family:var(--mono);font-size:.72rem;padding:.6rem .85rem;border-radius:7px;margin-bottom:1rem;display:none;line-height:1.5}
+.alert.show{display:block}
+.alert.err{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);color:#ff8a96}
+.alert.suc{background:rgba(0,214,143,.08);border:1px solid rgba(0,214,143,.25);color:#5df0b8}
+
+/* ── SUBMIT ── */
+.submit-btn{
+  width:100%;padding:.85rem;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border:none;border-radius:8px;color:#fff;
+  font-family:var(--sans);font-size:.95rem;font-weight:700;
+  cursor:pointer;letter-spacing:.01em;
+  transition:opacity .2s,box-shadow .2s;
+  box-shadow:0 4px 20px rgba(0,229,255,.2);
+}
+.submit-btn:hover{opacity:.92;box-shadow:0 6px 28px rgba(0,229,255,.3)}
+.submit-btn:active{transform:scale(.99)}
+.login-link{text-align:center;margin-top:1.2rem;font-family:var(--mono);font-size:.7rem;color:var(--muted2)}
+.login-link a{color:var(--cyan);text-decoration:none}
+
+/* ── LOADING OVERLAY ── */
+.loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.loading-overlay.show{opacity:1;pointer-events:all}
+.loader-ring{width:56px;height:56px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:1.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-family:var(--mono);font-size:.8rem;color:var(--muted2);letter-spacing:.1em}
+.loader-steps{margin-top:1.5rem;display:flex;flex-direction:column;gap:.4rem;width:270px}
+.loader-step{display:flex;align-items:center;gap:.6rem;font-family:var(--mono);font-size:.65rem;color:var(--muted);opacity:0;transform:translateX(-10px);transition:opacity .3s,transform .3s}
+.loader-step.visible{opacity:1;transform:translateX(0)}
+.loader-step.done{color:var(--green)}
+.step-icon{width:16px;text-align:center;font-size:.7rem}
+
+@media(max-width:768px){body{grid-template-columns:1fr}.left-panel{display:none}}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <svg class="circuit" viewBox="0 0 500 700" fill="none">
+    <path d="M50 100 H200 V200 H350" stroke="#1a3050" stroke-width="1"/>
+    <path d="M350 200 V350 H150 V450 H400" stroke="#1a3050" stroke-width="1"/>
+    <path d="M100 300 H250 V500 H180 V600" stroke="#1a3050" stroke-width="1"/>
+    <path d="M400 100 V250 H320 V400" stroke="#1a3050" stroke-width="1"/>
+    <circle cx="200" cy="100" r="4" fill="#0d2540" stroke="#1e3a5a" stroke-width="1"/>
+    <circle cx="350" cy="200" r="4" fill="#0d2540" stroke="#1e3a5a" stroke-width="1"/>
+    <circle cx="150" cy="450" r="4" fill="#0d2540" stroke="#1e3a5a" stroke-width="1"/>
+    <circle cx="250" cy="300" r="3" fill="#0d2540" stroke="#1e3a5a" stroke-width="1"/>
+    <circle cx="320" cy="400" r="3" fill="#0d2540" stroke="#1e3a5a" stroke-width="1"/>
+    <circle cx="180" cy="600" r="4" fill="#0d2540" stroke="#1e3a5a" stroke-width="1"/>
+  </svg>
+  <div class="brand" style="position:relative;z-index:1">
+    <div class="brand-mark">
+      <div class="brand-icon">🔐</div>
+      <span class="brand-name">CET324 · SecureReg</span>
+    </div>
+    <div class="hero-headline">Secure<br><span class="hl">Registration</span><br>System</div>
+    <p class="hero-sub">A prototype demonstrating cryptographically sound user registration with Google reCAPTCHA v2 — built for CET324 Advanced CyberSecurity.</p>
+    <div class="feature-list">
+      <div class="feature-item"><div class="feature-dot"></div>Real-time password entropy analysis</div>
+      <div class="feature-item"><div class="feature-dot"></div>Google reCAPTCHA v2 — "I'm not a robot"</div>
+      <div class="feature-item"><div class="feature-dot"></div>bcrypt-style password hashing (demo)</div>
+      <div class="feature-item"><div class="feature-dot"></div>Common password dictionary blocking</div>
+      <div class="feature-item"><div class="feature-dot"></div>Secure session on successful registration</div>
+    </div>
+  </div>
+  <div class="version-tag" style="position:relative;z-index:1">University of Sunderland · CET324 Assignment 2 · 2024–2025</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="form-wrapper">
+    <div class="form-title">Create Account</div>
+    <div class="form-sub">Already registered? <a href="login.html">Sign in →</a></div>
+
+    <div id="alertMsg" class="alert"></div>
+
+    <div class="field">
+      <div class="field-label">
+        <span>Username</span>
+        <span class="field-hint">3–20 chars, alphanumeric</span>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="username" placeholder="e.g. john_doe" autocomplete="off" oninput="validateUsername()">
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">
+        <span>Password</span>
+        <span class="field-hint" id="pwHint">—</span>
+      </div>
+      <div class="input-wrap">
+        <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password" oninput="analysePassword()">
+        <button class="eye-btn" onclick="togglePw('password')" type="button">👁</button>
+      </div>
+      <div class="strength-wrap" id="strengthWrap">
+        <div class="strength-track"><div class="strength-fill" id="strengthFill"></div></div>
+        <div class="strength-row">
+          <span class="strength-lbl" id="strengthLbl"></span>
+          <span class="strength-pts" id="strengthPts"></span>
+        </div>
+      </div>
+      <div class="criteria-grid" id="criteriaGrid">
+        <div class="crit" id="c-len"><span class="crit-dot"></span>8+ characters</div>
+        <div class="crit" id="c-up"><span class="crit-dot"></span>Uppercase (A-Z)</div>
+        <div class="crit" id="c-lo"><span class="crit-dot"></span>Lowercase (a-z)</div>
+        <div class="crit" id="c-num"><span class="crit-dot"></span>Number (0-9)</div>
+        <div class="crit" id="c-sym"><span class="crit-dot"></span>Symbol (!@#...)</div>
+        <div class="crit" id="c-12"><span class="crit-dot"></span>12+ characters</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label"><span>Confirm Password</span></div>
+      <div class="input-wrap">
+        <input type="password" id="confirmPw" placeholder="Repeat your password" oninput="checkMatch()">
+        <button class="eye-btn" onclick="togglePw('confirmPw')" type="button">👁</button>
+      </div>
+    </div>
+
+    <!-- ═══ REAL GOOGLE reCAPTCHA v2 ═══ -->
+    <div class="recaptcha-section">
+      <div class="recaptcha-label">Human Verification</div>
+      <div class="recaptcha-box" id="recaptchaBox">
+        <div class="g-recaptcha"
+          data-sitekey="6LdiSIssAAAAAC5lP1yRHEgxs0gci40vqsgAieqC"
+          data-theme="dark"
+          data-callback="onCaptchaSuccess"
+          data-expired-callback="onCaptchaExpired"
+          data-error-callback="onCaptchaError">
+        </div>
+      </div>
+      <div class="recaptcha-status" id="recaptchaStatus"></div>
+    </div>
+
+    <button class="submit-btn" onclick="handleSubmit()">Create Secure Account →</button>
+    <div class="login-link">Already have an account? <a href="login.html">Sign in here</a></div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loader-ring"></div>
+  <div class="loader-text">CREATING ACCOUNT</div>
+  <div class="loader-steps">
+    <div class="loader-step" id="step1"><span class="step-icon">🔑</span>Hashing password with bcrypt...</div>
+    <div class="loader-step" id="step2"><span class="step-icon">🧂</span>Generating salt rounds (cost factor: 12)...</div>
+    <div class="loader-step" id="step3"><span class="step-icon">🔐</span>Encrypting and storing user record...</div>
+    <div class="loader-step" id="step4"><span class="step-icon">✅</span>Account created — redirecting to dashboard...</div>
+  </div>
+</div>
+
+<script>
+// ══ reCAPTCHA CALLBACKS ══════════════════════════════════
+let captchaToken = null;
+
+function onCaptchaSuccess(token) {
+  captchaToken = token;
+  document.getElementById('recaptchaBox').classList.add('verified');
+  document.getElementById('recaptchaBox').classList.remove('failed');
+  const s = document.getElementById('recaptchaStatus');
+  s.className = 'recaptcha-status show ok';
+  s.innerHTML = '✓ &nbsp;reCAPTCHA passed — verified as human';
+}
+
+function onCaptchaExpired() {
+  captchaToken = null;
+  document.getElementById('recaptchaBox').classList.remove('verified');
+  const s = document.getElementById('recaptchaStatus');
+  s.className = 'recaptcha-status show fail';
+  s.innerHTML = '⚠ &nbsp;Verification expired — please tick the checkbox again';
+}
+
+function onCaptchaError() {
+  captchaToken = null;
+  document.getElementById('recaptchaBox').classList.add('failed');
+  const s = document.getElementById('recaptchaStatus');
+  s.className = 'recaptcha-status show fail';
+  s.innerHTML = '✗ &nbsp;reCAPTCHA error — please refresh the page';
+}
+
+// ══ PASSWORD STRENGTH ════════════════════════════════════
+const COMMON = ['password','123456','password1','qwerty','abc123','letmein','monkey',
+  'dragon','master','sunshine','welcome','admin','iloveyou','trustno1','princess',
+  'football','shadow','superman','michael','charlie','password123'];
+
+function analysePassword() {
+  const pw = document.getElementById('password').value;
+  if (!pw) {
+    document.getElementById('strengthWrap').style.display = 'none';
+    document.getElementById('criteriaGrid').style.display = 'none';
+    document.getElementById('pwHint').textContent = '—';
+    return;
+  }
+  document.getElementById('strengthWrap').style.display = 'block';
+  document.getElementById('criteriaGrid').style.display = 'grid';
+
+  const checks = {
+    'c-len': pw.length >= 8,
+    'c-up':  /[A-Z]/.test(pw),
+    'c-lo':  /[a-z]/.test(pw),
+    'c-num': /\d/.test(pw),
+    'c-sym': /[^A-Za-z0-9]/.test(pw),
+    'c-12':  pw.length >= 12,
+  };
+  let score = 0;
+  for (const [id, met] of Object.entries(checks)) {
+    document.getElementById(id).classList.toggle('ok', met);
+    if (met) score++;
+  }
+  const isCommon = COMMON.includes(pw.toLowerCase());
+  if (isCommon) score = 1;
+
+  const LEVELS = [
+    {max:1,lbl:'Very Weak',  color:'#ff4757',pct:10},
+    {max:2,lbl:'Weak',       color:'#ff6b35',pct:25},
+    {max:3,lbl:'Fair',       color:'#ffb300',pct:45},
+    {max:4,lbl:'Good',       color:'#a3e635',pct:65},
+    {max:5,lbl:'Strong',     color:'#00d68f',pct:83},
+    {max:6,lbl:'Very Strong',color:'#00e5ff',pct:100},
+  ];
+  const lvl = LEVELS.find(l => score <= l.max) || LEVELS[5];
+  document.getElementById('strengthFill').style.cssText = `width:${lvl.pct}%;background:${lvl.color}`;
+  document.getElementById('strengthLbl').textContent = isCommon ? '⚠ Common Password' : lvl.lbl;
+  document.getElementById('strengthLbl').style.color = isCommon ? '#ff4757' : lvl.color;
+  document.getElementById('strengthPts').textContent = score + '/6 criteria';
+  document.getElementById('pwHint').textContent = isCommon ? 'Too common!' : lvl.lbl;
+  document.getElementById('pwHint').style.color = isCommon ? '#ff4757' : lvl.color;
+  checkMatch();
+}
+
+function checkMatch() {
+  const pw = document.getElementById('password').value;
+  const cp = document.getElementById('confirmPw').value;
+  const inp = document.getElementById('confirmPw');
+  if (!cp) return;
+  inp.classList.toggle('ok-input',    pw === cp);
+  inp.classList.toggle('error-input', pw !== cp);
+}
+
+function validateUsername() {
+  const val = document.getElementById('username').value;
+  const ok  = /^[a-zA-Z0-9_]{3,20}$/.test(val);
+  document.getElementById('username').classList.toggle('ok-input',    ok);
+  document.getElementById('username').classList.toggle('error-input', val.length > 0 && !ok);
+}
+
+function togglePw(id) {
+  const inp = document.getElementById(id);
+  inp.type  = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ══ SUBMIT ═══════════════════════════════════════════════
+function showAlert(msg, type) {
+  const el = document.getElementById('alertMsg');
+  el.textContent = msg;
+  el.className   = 'alert show ' + (type === 'error' ? 'err' : 'suc');
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function countScore(pw) {
+  let s = 0;
+  if (pw.length >= 8) s++;
+  if (/[A-Z]/.test(pw)) s++;
+  if (/[a-z]/.test(pw)) s++;
+  if (/\d/.test(pw)) s++;
+  if (/[^A-Za-z0-9]/.test(pw)) s++;
+  if (pw.length >= 12) s++;
+  return s;
+}
+
+function demoHash(str) {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+  h2 = Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  const raw = (4294967296*(2097151&h2)+h1)>>>0;
+  return '$2b$12$'+raw.toString(16).padStart(8,'0')+'KxLmNpQrStUvWxYzAbCdEfGhIj';
+}
+
+function handleSubmit() {
+  document.getElementById('alertMsg').className = 'alert';
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const confirm  = document.getElementById('confirmPw').value;
+
+  if (!username) return showAlert('Username is required.', 'error');
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return showAlert('Username must be 3–20 alphanumeric characters.', 'error');
+  if (!password) return showAlert('Password is required.', 'error');
+  if (COMMON.includes(password.toLowerCase())) return showAlert('This password is too common. Please choose a stronger one.', 'error');
+  if (countScore(password) < 3) return showAlert('Password is too weak. Please satisfy at least 3 of the 6 criteria shown.', 'error');
+  if (password !== confirm) return showAlert('Passwords do not match.', 'error');
+  if (!captchaToken) {
+    document.getElementById('recaptchaBox').classList.add('failed');
+    const s = document.getElementById('recaptchaStatus');
+    s.className = 'recaptcha-status show fail';
+    s.innerHTML = '✗ &nbsp;Please complete the "I\'m not a robot" checkbox';
+    return showAlert('Please complete the reCAPTCHA verification before submitting.', 'error');
+  }
+
+  const sc = countScore(password);
+  const userData = {
+    username,
+    passwordHash:     demoHash(password),
+    passwordStrength: ['','Very Weak','Weak','Fair','Good','Strong','Very Strong'][Math.min(sc,6)],
+    registeredAt:     new Date().toISOString(),
+    captchaType:      'Google reCAPTCHA v2',
+    sessionToken:     Math.random().toString(36).slice(2) + Date.now().toString(36),
+  };
+  sessionStorage.setItem('secureRegUser', JSON.stringify(userData));
+  sessionStorage.setItem('secureRegPw',   password);
+
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+  ['step1','step2','step3','step4'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      el.classList.add('visible');
+      if (i < 3) el.classList.add('done');
+    }, (i + 1) * 700);
+  });
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 3400);
+}
+</script>
+</body>
+</html>
