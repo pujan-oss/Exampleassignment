@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureReg — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060a14;
+  --surface:#0c1220;
+  --card:#101827;
+  --card2:#0e1520;
+  --border:#1a2640;
+  --border2:#243352;
+  --cyan:#00e5ff;
+  --purple:#8b5cf6;
+  --green:#00d68f;
+  --red:#ff4757;
+  --amber:#ffb300;
+  --text:#f0f4ff;
+  --muted:#4a6080;
+  --muted2:#6b84a8;
+  --mono:'Space Mono',monospace;
+  --sans:'Syne',sans-serif;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2rem;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.topbar-brand{
+  display:flex;align-items:center;gap:.75rem;
+}
+.topbar-icon{
+  width:32px;height:32px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;
+}
+.topbar-name{
+  font-family:var(--mono);font-size:.8rem;
+  color:var(--cyan);letter-spacing:.12em;text-transform:uppercase;
+}
+.topbar-right{display:flex;align-items:center;gap:1rem}
+.session-badge{
+  display:flex;align-items:center;gap:.4rem;
+  font-family:var(--mono);font-size:.65rem;
+  color:var(--green);
+  border:1px solid rgba(0,214,143,.2);
+  background:rgba(0,214,143,.06);
+  padding:.25rem .6rem;border-radius:100px;
+}
+.session-badge::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--green);animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.logout-btn{
+  background:none;border:1px solid var(--border2);
+  color:var(--muted2);padding:.3rem .8rem;border-radius:6px;
+  font-family:var(--mono);font-size:.65rem;cursor:pointer;
+  transition:all .2s;letter-spacing:.05em;
+}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── MAIN ── */
+main{flex:1;padding:2rem;max-width:1100px;margin:0 auto;width:100%}
+
+/* Welcome banner */
+.welcome-banner{
+  background:linear-gradient(135deg,rgba(0,229,255,.06) 0%,rgba(139,92,246,.06) 100%);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  padding:2rem 2.5rem;
+  margin-bottom:2rem;
+  position:relative;
+  overflow:hidden;
+  animation:fadeUp .5s ease both;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.welcome-banner::before{
+  content:'';position:absolute;
+  top:-60px;right:-60px;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(0,229,255,.1),transparent 70%);
+}
+.welcome-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.welcome-text h1{font-size:1.8rem;font-weight:900;letter-spacing:-.02em;margin-bottom:.35rem}
+.welcome-text h1 span{
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.welcome-text p{font-family:var(--mono);font-size:.75rem;color:var(--muted2)}
+.welcome-avatar{
+  width:60px;height:60px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;
+  flex-shrink:0;
+}
+
+/* ── STATS ROW ── */
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1rem;
+  margin-bottom:2rem;
+}
+.stat-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:1.2rem 1.4rem;
+  animation:fadeUp .5s ease both;
+}
+.stat-card:nth-child(1){animation-delay:.05s}
+.stat-card:nth-child(2){animation-delay:.1s}
+.stat-card:nth-child(3){animation-delay:.15s}
+.stat-card:nth-child(4){animation-delay:.2s}
+.stat-label{font-family:var(--mono);font-size:.62rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+.stat-val{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+.stat-sub{font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:.2rem}
+.stat-val.green{color:var(--green)}
+.stat-val.cyan{color:var(--cyan)}
+.stat-val.amber{color:var(--amber)}
+.stat-val.purple{color:var(--purple)}
+
+/* ── CONTENT GRID ── */
+.content-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-bottom:2rem;
+}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  animation:fadeUp .5s ease both;
+}
+.panel:nth-child(1){animation-delay:.25s}
+.panel:nth-child(2){animation-delay:.3s}
+.panel-header{
+  padding:1rem 1.4rem;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{
+  font-size:.85rem;font-weight:700;letter-spacing:.01em;
+  display:flex;align-items:center;gap:.5rem;
+}
+.panel-title .icon{font-size:1rem}
+.panel-badge{
+  font-family:var(--mono);font-size:.6rem;
+  padding:.2rem .5rem;border-radius:4px;
+  background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15);
+  color:var(--cyan);
+}
+.panel-body{padding:1.4rem}
+
+/* Account detail table */
+.detail-table{width:100%;border-collapse:collapse}
+.detail-table tr{border-bottom:1px solid var(--border)}
+.detail-table tr:last-child{border-bottom:none}
+.detail-table td{padding:.6rem 0;font-family:var(--mono);font-size:.72rem;vertical-align:top}
+.detail-table .key{color:var(--muted2);width:40%;padding-right:.5rem}
+.detail-table .val{color:var(--text);word-break:break-all}
+.detail-table .val.green{color:var(--green)}
+.detail-table .val.cyan{color:var(--cyan)}
+.detail-table .val.amber{color:var(--amber)}
+.detail-table .val.hash{font-size:.6rem;color:var(--muted2)}
+
+/* Security score ring */
+.score-center{display:flex;flex-direction:column;align-items:center;padding:.5rem 0 1rem}
+.score-ring-wrap{position:relative;width:120px;height:120px;margin-bottom:1rem}
+.score-ring{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:8}
+.ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s ease,stroke 1s ease}
+.score-label{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.score-num{font-size:1.5rem;font-weight:900;letter-spacing:-.02em}
+.score-txt{font-family:var(--mono);font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+.security-criteria{display:flex;flex-direction:column;gap:.5rem;width:100%}
+.sec-row{
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:.68rem;
+  padding:.3rem .5rem;
+  border-radius:5px;
+  background:rgba(255,255,255,.02);
+}
+.sec-row-left{display:flex;align-items:center;gap:.5rem;color:var(--muted2)}
+.sec-row .check{font-size:.75rem}
+.sec-row.pass .sec-row-left{color:var(--text)}
+.sec-pill{
+  font-size:.55rem;padding:.15rem .45rem;border-radius:3px;
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.sec-pill.pass{background:rgba(0,214,143,.12);color:var(--green);border:1px solid rgba(0,214,143,.2)}
+.sec-pill.fail{background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.18)}
+
+/* ── SECURITY LOG ── */
+.log-panel{animation:fadeUp .5s .35s ease both}
+.log-list{display:flex;flex-direction:column;gap:.5rem}
+.log-item{
+  display:flex;align-items:flex-start;gap:.75rem;
+  padding:.6rem .75rem;
+  border-radius:7px;
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--border);
+}
+.log-icon{font-size:1rem;flex-shrink:0;margin-top:.05rem}
+.log-content{flex:1}
+.log-title{font-size:.78rem;font-weight:600;margin-bottom:.15rem}
+.log-meta{font-family:var(--mono);font-size:.6rem;color:var(--muted2)}
+.log-time{
+  font-family:var(--mono);font-size:.58rem;
+  color:var(--muted);white-space:nowrap;flex-shrink:0;
+}
+
+/* ── PASSWORD POLICY PANEL ── */
+.policy-panel{animation:fadeUp .5s .4s ease both}
+.policy-list{display:flex;flex-direction:column;gap:.6rem}
+.policy-item{
+  display:flex;align-items:flex-start;gap:.6rem;
+  padding:.5rem .6rem;border-radius:6px;
+  background:rgba(255,255,255,.02);
+}
+.policy-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:.3rem}
+.policy-dot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.policy-dot.warn{background:var(--amber)}
+.policy-text{font-family:var(--mono);font-size:.68rem;color:var(--muted2);line-height:1.5}
+.policy-text strong{color:var(--text)}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:1rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:.62rem;color:var(--muted);
+}
+
+@media(max-width:768px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .content-grid{grid-template-columns:1fr}
+  main{padding:1rem}
+  .topbar{padding:.75rem 1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-icon">🔐</div>
+    <span class="topbar-name">SecureReg · Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <div class="session-badge">Session Active</div>
+    <button class="logout-btn" onclick="logout()">Sign Out →</button>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- Welcome -->
+  <div class="welcome-banner">
+    <div class="welcome-row">
+      <div class="welcome-text">
+        <h1>Welcome back, <span id="usernameDisplay">User</span> 👋</h1>
+        <p id="regTimeDisplay">Registered — loading...</p>
+      </div>
+      <div class="welcome-avatar" id="avatarEl">👤</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Account Status</div>
+      <div class="stat-val green">Active</div>
+      <div class="stat-sub">Verified & Secured</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Password Strength</div>
+      <div class="stat-val cyan" id="strengthStat">—</div>
+      <div class="stat-sub" id="scoreStat">— / 6 criteria</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">CAPTCHA</div>
+      <div class="stat-val green">Passed ✓</div>
+      <div class="stat-sub" id="captchaCat">Image Challenge</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Encryption</div>
+      <div class="stat-val purple">bcrypt</div>
+      <div class="stat-sub">12 salt rounds</div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+
+    <!-- Account Details -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">👤</span> Account Details</div>
+        <div class="panel-badge">READ-ONLY</div>
+      </div>
+      <div class="panel-body">
+        <table class="detail-table">
+          <tr><td class="key">Username</td><td class="val cyan" id="d-username">—</td></tr>
+          <tr><td class="key">Registered</td><td class="val" id="d-registered">—</td></tr>
+          <tr><td class="key">Password Hash</td><td class="val hash" id="d-hash">—</td></tr>
+          <tr><td class="key">Hash Algorithm</td><td class="val green">bcrypt ($2b$12$)</td></tr>
+          <tr><td class="key">CAPTCHA Type</td><td class="val" id="d-captcha">—</td></tr>
+          <tr><td class="key">Session Token</td><td class="val hash" id="d-session">—</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Security Score -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">🛡️</span> Security Score</div>
+        <div class="panel-badge" id="scoreBadge">CALCULATING...</div>
+      </div>
+      <div class="panel-body">
+        <div class="score-center">
+          <div class="score-ring-wrap">
+            <svg class="score-ring" viewBox="0 0 100 100" width="120" height="120">
+              <circle class="ring-bg" cx="50" cy="50" r="40"/>
+              <circle class="ring-fill" id="ringFill" cx="50" cy="50" r="40"
+                stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke="var(--cyan)"/>
+            </svg>
+            <div class="score-label">
+              <div class="score-num" id="scoreNum">0</div>
+              <div class="score-txt">/ 100</div>
+            </div>
+          </div>
+        </div>
+        <div class="security-criteria" id="secCriteria"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom row -->
+  <div class="content-grid">
+
+    <!-- Security Event Log -->
+    <div class="panel log-panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">📋</span> Security Event Log</div>
+        <div class="panel-badge">LIVE</div>
+      </div>
+      <div class="panel-body">
+        <div class="log-list" id="logList"></div>
+      </div>
+    </div>
+
+    <!-- Password Policy -->
+    <div class="panel policy-panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="icon">📋</span> Password Policy Compliance</div>
+      </div>
+      <div class="panel-body">
+        <div class="policy-list" id="policyList"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <span>CET324 · Advanced CyberSecurity · University of Sunderland · 2024–2025</span>
+  <span id="footerSession">Session: —</span>
+</footer>
+
+<script>
+// ── Guard: redirect if no session ──────────────────────────────
+const raw = sessionStorage.getItem('secureRegUser');
+if (!raw) { window.location.href = 'register.html'; }
+
+const user = JSON.parse(raw);
+
+// ── Populate data ──────────────────────────────────────────────
+function fmt(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString('en-GB', {
+    day:'2-digit', month:'short', year:'numeric',
+    hour:'2-digit', minute:'2-digit', second:'2-digit'
+  });
+}
+
+// Welcome
+document.getElementById('usernameDisplay').textContent = user.username;
+document.getElementById('regTimeDisplay').textContent = 'Registered: ' + fmt(user.registeredAt);
+
+// Avatar emoji from first letter
+const avatarEmojis = {'a':'😀','b':'🐻','c':'🐱','d':'🐶','e':'🦅','f':'🦊','g':'🦍','h':'🐹','i':'🦋','j':'🦒','k':'🦘','l':'🦁','m':'🐭','n':'🦎','o':'🐙','p':'🐼','q':'🦔','r':'🦊','s':'🐺','t':'🐯','u':'🦄','v':'🦅','w':'🐺','x':'🦖','y':'🦓','z':'🦟'};
+const first = user.username[0].toLowerCase();
+document.getElementById('avatarEl').textContent = avatarEmojis[first] || '👤';
+
+// Strength stat
+const STRENGTH_SCORES = {'Very Weak':1,'Weak':2,'Fair':3,'Good':4,'Strong':5,'Very Strong':6};
+const sc = STRENGTH_SCORES[user.passwordStrength] || 3;
+document.getElementById('strengthStat').textContent = user.passwordStrength;
+document.getElementById('scoreStat').textContent = sc + ' / 6 criteria';
+
+// CAPTCHA
+document.getElementById('captchaCat').textContent = 'Category: ' + (user.captchaCategory || 'Image');
+
+// Details table
+document.getElementById('d-username').textContent = user.username;
+document.getElementById('d-registered').textContent = fmt(user.registeredAt);
+document.getElementById('d-hash').textContent = user.passwordHash;
+document.getElementById('d-captcha').textContent = 'Image Selection — ' + (user.captchaCategory || 'Mixed');
+document.getElementById('d-session').textContent = user.sessionToken.slice(0,24) + '...';
+document.getElementById('footerSession').textContent = 'Token: ' + user.sessionToken.slice(0,12) + '...';
+
+// ── SECURITY SCORE ─────────────────────────────────────────────
+const baseScore = Math.round((sc / 6) * 70 + 25); // 25-95 range
+const finalScore = Math.min(baseScore, 95);
+
+setTimeout(() => {
+  // Animate ring
+  const circumference = 251.2;
+  const offset = circumference - (finalScore / 100) * circumference;
+  const ring = document.getElementById('ringFill');
+  ring.style.strokeDashoffset = offset;
+
+  const color = finalScore >= 80 ? 'var(--green)' : finalScore >= 60 ? 'var(--cyan)' : finalScore >= 40 ? 'var(--amber)' : 'var(--red)';
+  ring.style.stroke = color;
+
+  // Animate number
+  let current = 0;
+  const target = finalScore;
+  const step = () => {
+    current = Math.min(current + 2, target);
+    document.getElementById('scoreNum').textContent = current;
+    document.getElementById('scoreNum').style.color = color;
+    if (current < target) requestAnimationFrame(step);
+  };
+  step();
+
+  // Badge
+  const badges = {95:'EXCELLENT',80:'STRONG',60:'GOOD',40:'FAIR',0:'WEAK'};
+  const badgeTxt = Object.entries(badges).find(([k]) => finalScore >= +k)?.[1] || 'WEAK';
+  document.getElementById('scoreBadge').textContent = badgeTxt;
+
+  // Criteria list
+  const criteria = [
+    { label: 'Password Hashed (bcrypt)', pass: true },
+    { label: 'CAPTCHA Verified', pass: true },
+    { label: 'Input Sanitised', pass: true },
+    { label: 'Session Token Generated', pass: true },
+    { label: 'Strong Password', pass: sc >= 4 },
+    { label: 'Max Length Compliant', pass: true },
+  ];
+
+  const el = document.getElementById('secCriteria');
+  el.innerHTML = criteria.map(c => `
+    <div class="sec-row ${c.pass ? 'pass' : ''}">
+      <div class="sec-row-left">
+        <span class="check">${c.pass ? '✓' : '✗'}</span>
+        ${c.label}
+      </div>
+      <span class="sec-pill ${c.pass ? 'pass' : 'fail'}">${c.pass ? 'PASS' : 'FAIL'}</span>
+    </div>
+  `).join('');
+}, 300);
+
+// ── EVENT LOG ──────────────────────────────────────────────────
+const now = new Date();
+const events = [
+  { icon: '✅', title: 'Registration Successful', meta: 'Account created with all validations passed', time: 'just now', delay: 100 },
+  { icon: '🔐', title: 'Password Hashed', meta: 'bcrypt with 12 salt rounds applied to credential', time: fmt(user.registeredAt), delay: 200 },
+  { icon: '🤖', title: 'CAPTCHA Passed', meta: 'Image challenge verified — human confirmed', time: fmt(user.registeredAt), delay: 300 },
+  { icon: '🔑', title: 'Session Token Issued', meta: 'Cryptographic session token generated and stored', time: fmt(user.registeredAt), delay: 400 },
+  { icon: '🛡️', title: 'Security Check Complete', meta: 'All security policies satisfied — access granted', time: fmt(user.registeredAt), delay: 500 },
+];
+
+const logList = document.getElementById('logList');
+events.forEach(ev => {
+  setTimeout(() => {
+    const div = document.createElement('div');
+    div.className = 'log-item';
+    div.style.opacity = '0';
+    div.style.transform = 'translateX(-8px)';
+    div.style.transition = 'opacity .3s, transform .3s';
+    div.innerHTML = `
+      <span class="log-icon">${ev.icon}</span>
+      <div class="log-content">
+        <div class="log-title">${ev.title}</div>
+        <div class="log-meta">${ev.meta}</div>
+      </div>
+      <span class="log-time">${ev.time}</span>
+    `;
+    logList.appendChild(div);
+    requestAnimationFrame(() => {
+      div.style.opacity = '1';
+      div.style.transform = 'translateX(0)';
+    });
+  }, ev.delay);
+});
+
+// ── PASSWORD POLICY LIST ───────────────────────────────────────
+const policies = [
+  { ok: true, text: '<strong>Hashing:</strong> Password stored as bcrypt hash — never in plaintext' },
+  { ok: sc >= 3, text: '<strong>Strength:</strong> Minimum strength threshold of "Fair" required' },
+  { ok: sc >= 5, text: '<strong>Complexity:</strong> Recommended to meet 5+ of 6 strength criteria' },
+  { ok: true, text: '<strong>Common Passwords:</strong> Blocked against dictionary of known weak passwords' },
+  { ok: true, text: '<strong>CAPTCHA:</strong> Image-based challenge prevents automated bot registrations' },
+  { ok: true, text: '<strong>Input Validation:</strong> Username sanitised — alphanumeric + underscore only' },
+  { ok: sc >= 4, text: '<strong>Session Security:</strong> Random session token with high entropy issued' },
+];
+
+document.getElementById('policyList').innerHTML = policies.map(p => `
+  <div class="policy-item">
+    <div class="policy-dot ${p.ok ? 'ok' : 'warn'}"></div>
+    <div class="policy-text">${p.text}</div>
+  </div>
+`).join('');
+
+// ── LOGOUT ─────────────────────────────────────────────────────
+function logout() {
+  sessionStorage.removeItem('secureRegUser');
+  window.location.href = 'register.html';
+}
+</script>
+</body>
+</html>
