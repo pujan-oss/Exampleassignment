@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureReg — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060a14;--surface:#0c1220;--card:#101827;--border:#1a2640;--border2:#243352;
+  --cyan:#00e5ff;--purple:#8b5cf6;--green:#00d68f;--red:#ff4757;--amber:#ffb300;
+  --text:#f0f4ff;--muted:#4a6080;--muted2:#6b84a8;
+  --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:2rem 1rem;position:relative;overflow:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;
+}
+.glow1{position:fixed;top:-200px;left:-200px;width:600px;height:600px;
+  background:radial-gradient(circle,rgba(0,229,255,.08),transparent 70%);pointer-events:none;}
+.glow2{position:fixed;bottom:-200px;right:-200px;width:600px;height:600px;
+  background:radial-gradient(circle,rgba(139,92,246,.08),transparent 70%);pointer-events:none;}
+
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:2.5rem;
+  width:100%;max-width:420px;
+  position:relative;z-index:1;
+  animation:fadeUp .5s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+}
+
+.brand{text-align:center;margin-bottom:2rem}
+.brand-icon{
+  width:48px;height:48px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border-radius:12px;margin:0 auto .75rem;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+}
+.brand-name{font-family:var(--mono);font-size:.75rem;color:var(--cyan);letter-spacing:.15em;text-transform:uppercase}
+.card-title{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.3rem}
+.card-sub{font-family:var(--mono);font-size:.7rem;color:var(--muted2)}
+.card-sub a{color:var(--cyan);text-decoration:none}
+
+.field{margin-bottom:1.2rem}
+.field-label{font-family:var(--mono);font-size:.68rem;color:var(--muted2);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;display:block}
+.input-wrap{position:relative}
+input[type=text],input[type=password]{
+  width:100%;background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:.7rem 2.5rem .7rem .9rem;
+  color:var(--text);font-family:var(--mono);font-size:.85rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.08)}
+.eye-btn{
+  position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted);cursor:pointer;font-size:.95rem;padding:0;
+  transition:color .2s;
+}
+.eye-btn:hover{color:var(--cyan)}
+
+.alert{font-family:var(--mono);font-size:.72rem;padding:.6rem .85rem;
+  border-radius:7px;margin-bottom:1rem;display:none;line-height:1.5}
+.alert.show{display:block}
+.alert.err{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);color:#ff8a96}
+
+.demo-hint{
+  font-family:var(--mono);font-size:.65rem;color:var(--muted);
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:6px;padding:.6rem .8rem;margin-bottom:1.2rem;line-height:1.7;
+}
+.demo-hint strong{color:var(--muted2)}
+
+.submit-btn{
+  width:100%;padding:.85rem;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border:none;border-radius:8px;color:#fff;
+  font-family:var(--sans);font-size:.95rem;font-weight:700;
+  cursor:pointer;letter-spacing:.01em;
+  transition:opacity .2s,box-shadow .2s;
+  box-shadow:0 4px 20px rgba(0,229,255,.2);
+}
+.submit-btn:hover{opacity:.9;box-shadow:0 6px 28px rgba(0,229,255,.3)}
+.reg-link{text-align:center;margin-top:1.2rem;font-family:var(--mono);font-size:.7rem;color:var(--muted2)}
+.reg-link a{color:var(--cyan);text-decoration:none}
+
+.divider{height:1px;background:var(--border);margin:1.2rem 0}
+</style>
+</head>
+<body>
+<div class="glow1"></div><div class="glow2"></div>
+<div class="card">
+  <div class="brand">
+    <div class="brand-icon">🔐</div>
+    <div class="brand-name">SecureReg · CET324</div>
+  </div>
+  <div class="card-title">Sign In</div>
+  <div class="card-sub" style="margin-bottom:1.5rem">No account? <a href="register.html">Register here →</a></div>
+
+  <div id="alertMsg" class="alert"></div>
+
+  <div class="demo-hint">
+    <strong>Demo note:</strong> This login works with the account you just registered. Your credentials are stored in the current session — register first, then sign in.
+  </div>
+
+  <div class="field">
+    <label class="field-label">Username</label>
+    <div class="input-wrap">
+      <input type="text" id="username" placeholder="Your username" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Password</label>
+    <div class="input-wrap">
+      <input type="password" id="password" placeholder="Your password">
+      <button class="eye-btn" onclick="togglePw()">👁</button>
+    </div>
+  </div>
+
+  <button class="submit-btn" onclick="handleLogin()">Sign In →</button>
+  <div class="reg-link" style="margin-top:1rem">Don't have an account? <a href="register.html">Create one</a></div>
+</div>
+
+<script>
+function togglePw(){
+  const i=document.getElementById('password');
+  i.type=i.type==='password'?'text':'password';
+}
+function showAlert(msg){
+  const el=document.getElementById('alertMsg');
+  el.textContent=msg;el.className='alert show err';
+}
+function handleLogin(){
+  const u=document.getElementById('username').value.trim();
+  const p=document.getElementById('password').value;
+  if(!u||!p) return showAlert('Please fill in all fields.');
+  const raw=sessionStorage.getItem('secureRegUser');
+  if(!raw) return showAlert('No registered account found. Please register first.');
+  const user=JSON.parse(raw);
+  if(user.username!==u){
+    return showAlert('Username not found. Check your username or register a new account.');
+  }
+  // We can't reverse the hash, so for demo: store plain for login check separately
+  // Use a demo check: stored loginPw set at registration
+  const loginPw=sessionStorage.getItem('secureRegPw');
+  if(loginPw!==p) return showAlert('Incorrect password. Please try again.');
+  window.location.href='dashboard.html';
+}
+</script>
+</body>
+</html>
